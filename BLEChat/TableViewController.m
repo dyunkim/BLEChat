@@ -98,12 +98,13 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    NSLog(@"Attemp to connect to peripherals %ld", (long)indexPath.row);
+    NSLog(@"Attempt to connect to peripherals %ld", (long)indexPath.row);
     CBPeripheral *aPeripheral = [self.bleShield.peripherals objectAtIndex:indexPath.row];
     
     //CHANGE 6: add code her to connect to the selected peripheral (aPeripheral)
     
-    
+            // connect to the first found peripheral
+    [self.bleShield connectPeripheral:aPeripheral];
 }
 
 /*

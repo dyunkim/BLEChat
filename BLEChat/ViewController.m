@@ -11,9 +11,18 @@
 
 @interface ViewController ()
 
+@property (weak, nonatomic) IBOutlet UILabel *shieldNameLabel;
+
+
 @end
 
 @implementation ViewController
+
+-(BLE*)bleShield
+{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    return appDelegate.bleShield;
+}
 
 // CHANGE 3: Add support for lazy instantiation (like we did in the table view controller)
 
@@ -24,9 +33,9 @@
     
     // CHANGE 1.a: change this as you no longer need to instantiate the BLE Object like this
     // nor should this ViewController be the delegate
-    bleShield = [[BLE alloc] init];
-    [bleShield controlSetup];
-    bleShield.delegate = self;
+//    bleShield = [[BLE alloc] init];
+//    [bleShield controlSetup];
+//    bleShield.delegate = self;
     
     //CHANGE 4: add subscription to notifications from the app delegate
     //These selector functions should be created from the old BLEDelegate functions
@@ -49,7 +58,7 @@
 NSTimer *rssiTimer;
 -(void) readRSSITimer:(NSTimer *)timer
 {
-    [bleShield readRSSI]; // be sure that the RSSI is up to date
+    [self.bleShield readRSSI]; // be sure that the RSSI is up to date
 }
 
 #pragma mark - BLEdelegate protocol methods
@@ -71,32 +80,47 @@ NSTimer *rssiTimer;
 {
     NSData* d = [[notification userInfo] objectForKey:@"data"];
     NSString *s = [[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding];
-    self.label.text = s;
+   
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        self.label.text = s;
+    });
 }
 
 // we disconnected, stop running
-- (void) bleDidDisconnect
-{
-    //CHANGE 5.b: remove all instances of the button at top
-    [self.buttonConnect setTitle:@"Connect" forState:UIControlStateNormal];
-    
-    [rssiTimer invalidate];
-}
+//- (void) bleDidDisconnect
+//{
+//    //CHANGE 5.b: remove all instances of the button at top
+//    [self.buttonConnect setTitle:@"Connect" forState:UIControlStateNormal];
+//    
+//    [rssiTimer invalidate];
+//}
 
 //CHANGE 7: create function called from "BLEDidConnect" notification (you can change the function below)
 // in this function, update a label on the UI to have the name of the active peripheral
 // you might be interested in the following method:
 // NSString *deviceName =[notification.userInfo objectForKey:@"deviceName"];
 // now just wait to send or receive
--(void) bleDidConnect
+
+//-(void) bleDidConnect
+//{
+//    //CHANGE 5.a: Remove all usage of the connect button and remove from storyboard
+//    [self.spinner stopAnimating];
+//    [self.buttonConnect setTitle:@"Disconnect" forState:UIControlStateNormal];
+//    
+//    // Schedule to read RSSI every 1 sec.
+//    rssiTimer = [NSTimer scheduledTimerWithTimeInterval:(float)1.0 target:self selector:@selector(readRSSITimer:) userInfo:nil repeats:YES];
+//}
+
+-(void) onBLEDidConnect:(NSNotification *)notification
 {
-    //CHANGE 5.a: Remove all usage of the connect button and remove from storyboard
-    [self.spinner stopAnimating];
-    [self.buttonConnect setTitle:@"Disconnect" forState:UIControlStateNormal];
-    
-    // Schedule to read RSSI every 1 sec.
-    rssiTimer = [NSTimer scheduledTimerWithTimeInterval:(float)1.0 target:self selector:@selector(readRSSITimer:) userInfo:nil repeats:YES];
+    NSString* d = [[notification userInfo] objectForKey:@"deviceName"];
+    self.shieldNameLabel.text = d;
 }
+
+-(void) onBLEDidDisconnect:(NSNotification *)notification
+{
+}
+
 
 
 
@@ -116,53 +140,53 @@ NSTimer *rssiTimer;
     s = [NSString stringWithFormat:@"%@\r\n", s];
     d = [s dataUsingEncoding:NSUTF8StringEncoding];
     
-    [bleShield write:d];
+    [self.bleShield write:d];
 }
 
 
-// CHANGE 1.b: change this as you no longer need to search for perpipherals in this view controller
-- (IBAction)BLEShieldScan:(id)sender
-{
-    // disconnect from any peripherals
-    if (bleShield.activePeripheral)
-        if(bleShield.activePeripheral.state == CBPeripheralStateConnected)
-        {
-            [[bleShield CM] cancelPeripheralConnection:[bleShield activePeripheral]];
-            return;
-        }
-    
-    // set peripheral to nil
-    if (bleShield.peripherals)
-        bleShield.peripherals = nil;
-    
-    //start search for peripherals with a timeout of 3 seconds
-    // this is an asynchronous call and will return before search is complete
-    [bleShield findBLEPeripherals:3];
-    
-    // after three seconds, try to connect to first peripheral
-    [NSTimer scheduledTimerWithTimeInterval:(float)3.0
-                                     target:self
-                                   selector:@selector(connectionTimer:)
-                                   userInfo:nil
-                                    repeats:NO];
-    
-    // give connection feedback to the user
-    [self.spinner startAnimating];
-}
+//// CHANGE 1.b: change this as you no longer need to search for perpipherals in this view controller
+//- (IBAction)BLEShieldScan:(id)sender
+//{
+//    // disconnect from any peripherals
+//    if (bleShield.activePeripheral)
+//        if(bleShield.activePeripheral.state == CBPeripheralStateConnected)
+//        {
+//            [[bleShield CM] cancelPeripheralConnection:[bleShield activePeripheral]];
+//            return;
+//        }
+//    
+//    // set peripheral to nil
+//    if (bleShield.peripherals)
+//        bleShield.peripherals = nil;
+//    
+//    //start search for peripherals with a timeout of 3 seconds
+//    // this is an asynchronous call and will return before search is complete
+//    [bleShield findBLEPeripherals:3];
+//    
+//    // after three seconds, try to connect to first peripheral
+//    [NSTimer scheduledTimerWithTimeInterval:(float)3.0
+//                                     target:self
+//                                   selector:@selector(connectionTimer:)
+//                                   userInfo:nil
+//                                    repeats:NO];
+//    
+//    // give connection feedback to the user
+//    [self.spinner startAnimating];
+//}
 
-// CHANGE 1.c: change this as you no longer need to create the connection in this view controller
-// Called when scan period is over to connect to the first found peripheral
--(void) connectionTimer:(NSTimer *)timer
-{
-    if(bleShield.peripherals.count > 0)
-    {
-        // connect to the first found peripheral
-        [bleShield connectPeripheral:[bleShield.peripherals objectAtIndex:0]];
-    }
-    else
-    {
-        [self.spinner stopAnimating];
-    }
-}
+//// CHANGE 1.c: change this as you no longer need to create the connection in this view controller
+//// Called when scan period is over to connect to the first found peripheral
+//-(void) connectionTimer:(NSTimer *)timer
+//{
+//    if(bleShield.peripherals.count > 0)
+//    {
+//        // connect to the first found peripheral
+//        [bleShield connectPeripheral:[bleShield.peripherals objectAtIndex:0]];
+//    }
+//    else
+//    {
+//        [self.spinner stopAnimating];
+//    }
+//}
 
 @end
