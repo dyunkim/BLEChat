@@ -13,6 +13,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *shieldNameLabel;
 
+@property (weak, nonatomic) IBOutlet UILabel *ButtonLabel;
 
 @end
 
@@ -83,6 +84,16 @@ NSTimer *rssiTimer;
    
     dispatch_async(dispatch_get_main_queue(), ^(){
         self.label.text = s;
+        
+        NSLog(@"%@", s);
+        
+        if([s isEqualToString:@"0"]){
+            self.ButtonLabel.text= @"unpressed";
+        }
+        else{
+            self.ButtonLabel.text= @"pressed";
+        }
+
     });
 }
 
