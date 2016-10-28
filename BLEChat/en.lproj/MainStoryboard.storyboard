@@ -103,6 +103,7 @@
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hU1-Gq-fTl">
                                 <frame key="frameInset" minX="50" minY="410" width="230" height="2"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" red="1" green="0.0" blue="0.02053295671066202" alpha="1" colorSpace="calibratedRGB"/>
                             </progressView>
                             <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="V6u-Sz-kBV">
                                 <frame key="frameInset" minX="35" minY="136" width="87" height="21"/>
@@ -119,6 +120,7 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="dzB-hO-xIS">
                                 <frame key="frameInset" minX="35" minY="165" width="51" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" red="0.00976912433938526" green="1" blue="0.26333958094454446" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <action selector="ledToggle:" destination="2" eventType="valueChanged" id="dmE-Oo-0X6"/>
                                 </connections>
@@ -133,6 +135,7 @@
                             <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="180" minValue="0.0" maxValue="180" translatesAutoresizingMaskIntoConstraints="NO" id="wTT-2K-4yd">
                                 <frame key="frameInset" minX="119" minY="165" width="163" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" red="0.013768930221440212" green="1" blue="0.26066703902284183" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <action selector="brightnessChanged:" destination="2" eventType="touchUpInside" id="D0b-VO-cQl"/>
                                     <action selector="brightnessChanged:" destination="2" eventType="touchUpOutside" id="Wq5-Fb-8X4"/>
@@ -141,11 +144,13 @@
                             </slider>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="tintColor" red="1" green="0.12209372960560461" blue="0.069077509685280591" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
                     <navigationItem key="navigationItem" id="FMb-Dt-LLM"/>
                     <connections>
                         <outlet property="ButtonLabel" destination="asL-gV-tcE" id="LQu-YI-LO9"/>
                         <outlet property="ledBrightness" destination="wTT-2K-4yd" id="qhD-0O-JkH"/>
+                        <outlet property="ledBrightnessLabel" destination="6LD-EK-bWK" id="DJB-0Y-JQ3"/>
                         <outlet property="ledToggle" destination="dzB-hO-xIS" id="NSi-4O-vz3"/>
                         <outlet property="progressBar" destination="hU1-Gq-fTl" id="I2R-ol-tBQ"/>
                         <outlet property="shieldNameLabel" destination="Nyh-7J-GQm" id="3sk-2G-sWP"/>

@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *ButtonLabel;
 @property (weak, nonatomic) IBOutlet UISlider *ledBrightness;
 @property (weak, nonatomic) IBOutlet UISwitch *ledToggle;
+@property (weak, nonatomic) IBOutlet UILabel *ledBrightnessLabel;
 
 @end
 
@@ -96,7 +97,13 @@ NSTimer *rssiTimer;
 
 - (IBAction)brightnessChanged:(id)sender {
     NSString* s = [NSString stringWithFormat:@"0%.0f\n", self.ledBrightness.value];
+    
     [self BLEShieldSend: s];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        self.ledBrightnessLabel.text = [NSString stringWithFormat:@"Brightness: %.0f", self.ledBrightness.value];
+    });
 }
 - (IBAction)ledToggle:(id)sender {
     //Opcode for LED == 0
