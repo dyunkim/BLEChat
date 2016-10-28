@@ -8,6 +8,8 @@
 //
 
 #import "ViewController.h"
+#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 
 @interface ViewController ()
 
@@ -18,6 +20,10 @@
 @property (weak, nonatomic) IBOutlet UISlider *ledBrightness;
 @property (weak, nonatomic) IBOutlet UISwitch *ledToggle;
 @property (weak, nonatomic) IBOutlet UILabel *ledBrightnessLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property bool mjFaceLeft;
+@property bool mjFaceRight;
+
 
 @end
 
@@ -36,6 +42,12 @@
     [super viewDidLoad];
     self.ledBrightness.enabled = NO;
     [self.ledBrightness setContinuous:NO];
+    UIImage* gif = [UIImage animatedImageNamed: @"mj-" duration: 1.0];
+    self.imageView.image = gif;
+    self.mjFaceRight = YES;
+    self.mjFaceLeft = NO;
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBLEDidConnect:) name:kBleConnectNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBLEDidDisconnect:) name:kBleDisconnectNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBLEDidUpdateRSSI:) name:kBleRSSINotification object:nil];
@@ -140,18 +152,50 @@ NSTimer *rssiTimer;
 {
     if([flexValue isEqualToString:@"0"]){
         NSLog(@"Flat");
-        self.ButtonLabel.text = @"Flat";    //TODO: use main queue
     }
     else if([flexValue isEqualToString:@"1"]){
         NSLog(@"Up");
-        self.ButtonLabel.text = @"Up";
+        
+        if(self.mjFaceLeft){
+            self.imageView.transform = CGAffineTransformMakeScale(1, 1);
+            self.mjFaceLeft = NO;
+            self.mjFaceRight = YES;
+        }
+        
         self.progressBar.progress = self.progressBar.progress+.1;
+       
+//        Found code for moving image @ http://stackoverflow.com/questions/13333361/change-position-of-the-uiimageview
+        [UIView animateWithDuration:0.45
+                              delay:0.0
+                            options: UIViewAnimationCurveEaseOut
+                         animations:^{
+                             [self.imageView setFrame:CGRectMake(self.imageView.frame.origin.x-10, self.imageView.frame.origin.y, self.imageView.frame.size.width, self.imageView.frame.size.height)];
+                         }
+                         completion:^(BOOL finished){
+                         }];
+        
         
     }
     else if([flexValue isEqualToString:@"2"]){
-        NSLog(@"Down");
-        self.ButtonLabel.text = @"Down";
         self.progressBar.progress = self.progressBar.progress-.1;
+
+        
+        if(self.mjFaceRight){
+            self.imageView.transform = CGAffineTransformMakeScale(-1, 1);
+            self.mjFaceRight = NO;
+            self.mjFaceLeft = YES;
+        }
+        
+        [UIView animateWithDuration:0.45
+                              delay:0.0
+                            options: UIViewAnimationCurveEaseOut
+                         animations:^{
+                             [self.imageView setFrame:CGRectMake(self.imageView.frame.origin.x+10, self.imageView.frame.origin.y, self.imageView.frame.size.width, self.imageView.frame.size.height)];
+                         }
+                         completion:^(BOOL finished){
+                             NSLog(@"Done!");
+                         }];
+        
     }
 }
 
